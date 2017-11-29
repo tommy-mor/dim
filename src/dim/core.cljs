@@ -16,8 +16,9 @@
     "click to edit"
     (do
       (let [[number unit element] (clojure.string/split inp ",")]
-        (fn []
-          (reduce (fn [a b] (str a " " b)) [(or number "NUMBER") (or unit "UNIT") (or element "ELEMENT")]))))))
+          (reduce (fn [a b] (str a " " b)) [(or number "NUMBER") (or unit "UNIT") (or element "ELEMENT")])))))
+
+
 
 (defn segment [item]
   (let [state (r/atom "view")
@@ -26,14 +27,13 @@
         to-view #(reset! state "view")]
     (fn [{:keys [id number text]}]
       (cond (= @state "view")
-            [:div {:class "thinga" :on-click to-edit} [interp @val]]
+            [:div {:class "thinga" :on-click to-edit} (interp @val)]
             (= @state "edit")
             [:input {:key id :id id :value @val
                      :on-change #(reset! val (-> % .-target .-value))
                      :on-key-down #(case (.-which %)
-                                     13 (to-view)
+                                     (to-view)
                                      nil)}]))))
-
 (defn lister []
   [:ul
    (for [item (vals @table)]
@@ -47,7 +47,7 @@
 (defn home-page []
   [:div [:h2 "Welcome to Reagent"]
    [control-component]
-   [lister]])
+   (lister)])
 
 ;; -------------------------
 ;; Initialize app
