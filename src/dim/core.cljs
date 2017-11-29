@@ -5,11 +5,11 @@
 ;; -------------------------
 ;; Views
 (def counter (r/atom 0))
-(defonce table (r/atom (sorted-map)))
+(defonce tablemap (r/atom (sorted-map)))
 
 (defn add-segment [number text]
   (let [id (swap! counter inc)]
-    (swap! table assoc id {:id id :number number :text text})))
+    (swap! tablemap assoc id {:id id :number number :text text})))
 
 (defn interp [inp]
   (if (= inp "")
@@ -34,20 +34,22 @@
                      :on-key-down #(case (.-which %)
                                      13 (to-view)
                                      nil)}]))))
-(defn lister []
-  [:ul
-   (for [item (vals @table)]
-     [:li [segment item]])])
+(defn table []
+  [:div.table
+   (for [item (vals @tablemap)]
+     [segment item])])
 
 (defn control-component []
   [:div
    "press to add new segment: "
-   [:input {:type "button" :value "click me" :on-click #((add-segment 14 "NaOH"))}]])
+   [:input {:type "button" :value "click me" :on-click #((add-segment 14 "NaOH"))}]
+   [:br]
+   "format: " [:code "NUMBER, UNIT, ELEMENT"]])
 
 (defn home-page []
   [:div [:h2 "Welcome to Reagent"]
    [control-component]
-   (lister)])
+   (table)])
 
 ;; -------------------------
 ;; Initialize app
