@@ -16,7 +16,7 @@
     "click to edit"
     (do
       (let [[number unit element] (clojure.string/split inp ",")]
-          (reduce (fn [a b] (str a " " b)) [(or number "NUMBER") (or unit "UNIT") (or element "ELEMENT")])))))
+          [:span  (reduce (fn [a b] (str a " " b)) [(or number "NUMBER") (or unit "UNIT") (or element "ELEMENT")])]))))
 
 
 
@@ -32,7 +32,7 @@
             [:input {:key id :id id :value @val
                      :on-change #(reset! val (-> % .-target .-value))
                      :on-key-down #(case (.-which %)
-                                     (to-view)
+                                     13 (to-view)
                                      nil)}]))))
 (defn lister []
   [:ul
