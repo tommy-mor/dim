@@ -11,13 +11,28 @@
   (let [id (swap! counter inc)]
     (swap! table assoc id {:id id :number number :text text})))
 
+(defn interp [inp]
+  (if (= inp "")
+    "click to edit"
+    (do
+      (let [[number unit element] (clojure.string/split inp ",")]
+        (fn []
+          (reduce (fn [a b] (str a " " b)) [(or number "NUMBER") (or unit "UNIT") (or element "ELEMENT")]))))))
+
 (defn segment [item]
-  (let [state (r/atom "view")]
+  (let [state (r/atom "view")
+        val (r/atom "")
+        to-edit #(reset! state "edit")
+        to-view #(reset! state "view")]
     (fn [{:keys [id number text]}]
       (cond (= @state "view")
-            [:div {:class "thinga" :on-click #(reset! state "edit")} number " - " text]
+            [:div {:class "thinga" :on-click to-edit} [interp @val]]
             (= @state "edit")
-            [:input {:value (str number "," text)}]))))
+            [:input {:key id :id id :value @val
+                     :on-change #(reset! val (-> % .-target .-value))
+                     :on-key-down #(case (.-which %)
+                                     13 (to-view)
+                                     nil)}]))))
 
 (defn lister []
   [:ul
