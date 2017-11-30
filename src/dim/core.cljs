@@ -2,6 +2,14 @@
   (:require
    [reagent.core :as r]))
 
+;;TODO put in another namespace
+(defn draggable-maker [this]
+  (.draggable (js/$ (r/dom-node this))))
+
+;; render must be function
+(defn draggable-component [reder & args]
+  (r/create-class {:reagent-render (fn [] [apply reder args]) :component-did-mount draggable-maker}))
+
 ;; -------------------------
 ;; Views
 (defonce counter (r/atom 0))
@@ -62,35 +70,31 @@
    "drag things here to manipulate"
    [:div.dragbox
     [drag-target "DELETE" #(println "delete this node" %)]
-    [drag-source "NORMAL ELEMENT"]
-    [drag-source "1/? ELEMENT"]
-    [drag-source "?/1 ELEMENT"]
-    [drag-source "EQUALS ELEMENT"]]])
+    [draggable-component drag-source "NORMAL ELEMENT"]
+    [draggable-component drag-source "1/? ELEMENT"]
+    [draggable-component drag-source "?/1 ELEMENT"]
+    [draggable-component drag-source "EQUALS ELEMENT"]]])
 
-(comment  (defn home-page []
-            [:div [:h2 "Welcome to The Formatter"]
-             [control-component]
-             [table]
-             [drag-hub]]))
+(defn home-page []
+  [:div [:h2 "Welcome to The Formatter"]
+   [control-component]
+   [table]
+   [drag-hub]])
 
 (defn box [title]
   [:div {:style {:background-color "pink" :width "150px" :height "150px" :padding "0.5em"}}
    [:p title]])
 
-(defn draggable-maker [this]
-  (.draggable (js/$ (r/dom-node this))))
-
-;; render must be function
-(defn draggable-component [reder & args]
-  (r/create-class {:reagent-render (fn [] [apply reder args]) :component-did-mount draggable-maker}))
 
 ;; -------------------------
 ;; Initialize app
-(defn home-page []
-  [:div
-   [draggable-component box "title of this box"]
-   [draggable-component box "title of this box"]
-   [draggable-component box "title of this box"]])
+
+;;drag test
+(comment (defn home-page []
+           [:div
+            [draggable-component box "title of this box"]
+            [draggable-component box "title of this box"]
+            [draggable-component box "title of this box"]]))
 
 (defn mount-root []
   (r/render [home-page] (.getElementById js/document "app")))
