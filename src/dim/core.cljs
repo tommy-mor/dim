@@ -9,14 +9,14 @@
 
 (defn add-segment [number text]
   (let [id (swap! counter inc)]
-    (swap! tablemap assoc id {:id id :number number :text text})))
+    (swap! tablemap assoc id {:key id :id id :number number :text text})))
 
 (defn interp [inp]
   (if (= inp "")
     "click to edit"
     (do
       (let [[number unit element] (clojure.string/split inp ",")]
-          [:span  (reduce (fn [a b] (str a " " b)) [(or number "NUMBER") (or unit "UNIT") (or element "ELEMENT")])]))))
+        (reduce (fn [a b] (str a " " b)) [(or number "NUMBER") (or unit "UNIT") (or element "ELEMENT")])))))
 
 
 
@@ -49,7 +49,7 @@
 (defn home-page []
   [:div [:h2 "Welcome to Reagent"]
    [control-component]
-   (table)])
+   [table]])
 
 ;; -------------------------
 ;; Initialize app
