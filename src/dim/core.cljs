@@ -1,14 +1,8 @@
 (ns dim.core
   (:require
+   [dim.helper :as h]
    [reagent.core :as r]))
 
-;;TODO put in another namespace
-(defn draggable-maker [this]
-  (.draggable (js/$ (r/dom-node this))))
-
-;; render must be function
-(defn draggable-component [reder & args]
-  (r/create-class {:reagent-render (fn [] [apply reder args]) :component-did-mount draggable-maker}))
 
 ;; -------------------------
 ;; Views
@@ -42,7 +36,7 @@
                                      13 (to-view)
                                      nil)}]))))
 (defn table []
-  [:div.table
+  [:div#table.table
    (for [item (vals @tablemap)]
      [segment item])])
 
@@ -54,31 +48,45 @@
    "format: " [:code "NUMBER UNIT ELEMENT"]])
 
 
-(defn drag-target [title func]
+(defn drag-target [title]
   [:div.dragtarget
    [:code
     title]])
 
 ;; returns a map of new item, to be added to the tablemap
 ;; depends on how dragging lib works
+
+(def action-to-display {"normal" "NORMAL ELEMENT"
+                        "under" "1/? ELEMENT"
+                        "over" "?/1 ELEMENT"
+                        "equals" "EQUALS ELEMENT"})
+
 (defn drag-source [title]
-  [:div.dragsource
-   [:code title]])
+  [:div {:id title :class "dragsource"}
+   [:code (get action-to-display title)]])
 
 (defn drag-hub [items]
   [:div.green
    "drag things here to manipulate"
    [:div.dragbox
-    [drag-target "DELETE" #(println "delete this node" %)]
-    [draggable-component drag-source "NORMAL ELEMENT"]
-    [draggable-component drag-source "1/? ELEMENT"]
-    [draggable-component drag-source "?/1 ELEMENT"]
-    [draggable-component drag-source "EQUALS ELEMENT"]]])
+    [drag-target "DELETE"]
+    [h/draggable-component drag-source "normal"]
+    [h/draggable-component drag-source "under"]
+    [h/draggable-component drag-source "over"]
+    [h/draggable-component drag-source "equals"]]])
+
+(defn handle-event [event draggable]
+  (let [id (as-> draggable x (.-draggable x) (aget x "0") (.-id x))]
+    (condp = id
+      "normal" :>> (add-segment 15 "normals")
+      "under" :>> (add-segment 15 "unders")
+      "over" :>> (add-segment 15 "overs")
+      "equals" :>> (add-segment 15 "equals"))))
 
 (defn home-page []
   [:div [:h2 "Welcome to The Formatter"]
    [control-component]
-   [table]
+   [h/droppable-component table handle-event]
    [drag-hub]])
 
 (defn box [title]
