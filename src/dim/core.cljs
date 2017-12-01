@@ -3,6 +3,9 @@
    [dim.helper :as h]
    [reagent.core :as r]))
 
+;; maybe to solve function call issue, use something like re-frame events to handle it correctly
+;; maybe use re-frame, or use on of the recipies on ghub.
+
 
 ;; -------------------------
 ;; Views
@@ -77,11 +80,12 @@
 
 (defn handle-event [event draggable]
   (let [id (as-> draggable x (.-draggable x) (aget x "0") (.-id x))]
-    (condp = id
-      "normal" :>> (add-segment 15 "normals")
-      "under" :>> (add-segment 15 "unders")
-      "over" :>> (add-segment 15 "overs")
-      "equals" :>> (add-segment 15 "equals"))))
+    "dddddd"
+    (case id
+      "normal" (add-segment 15 "normals")
+      "under" (add-segment 15 "unders")
+      "over" (add-segment 15 "overs")
+      "equals" (add-segment 15 "equals"))))
 
 (defn home-page []
   [:div [:h2 "Welcome to The Formatter"]
